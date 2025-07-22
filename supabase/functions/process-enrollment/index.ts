@@ -12,28 +12,34 @@ Deno.serve(async (req) => {
 
     console.log(`[EDGE FUNCTION] Processando matrícula com ID: ${enrollment_id}`);
 
+    // Buscar matrícula
     const { data: enrollment, error: fetchError } = await supabaseClient
       .from('enrollments')
       .select('*')
       .eq('id', enrollment_id)
       .single();
-
     if (fetchError) throw fetchError;
 
+    // Upsert do student
     const { data: student, error: studentError } = await supabaseClient
       .from('students')
       .upsert({ enrollment_id: enrollment.id }, { onConflict: 'enrollment_id' })
       .select('id')
       .single();
-
     if (studentError) throw studentError;
     const studentId = student.id;
     console.log(`[EDGE FUNCTION] Prontuário OK. Student ID: ${studentId}`);
 
-    const personalData = enrollment.confirmed_personal_data;
-    const addressData = enrollment.confirmed_address_data;
-    const schoolingData = enrollment.confirmed_schooling_data;
+    // NOVA ETAPA: Atualiza a matrícula com o student_id recém-criado
+    const { error: updateEnrollmentError } = await supabaseClient
+      .from('enrollments')
+      .update({ student_id: studentId })
+      .eq('id', enrollment_id);
+    if (updateEnrollmentError) throw updateEnrollmentError;
+    console.log(`[EDGE FUNCTION] Tabela 'enrollments' atualizada com o student_id.`);
 
+    // Upsert dos dados pessoais
+    const personalData = enrollment.confirmed_personal_data;
     if (personalData) {
       delete personalData.user_id;
       const { error } = await supabaseClient.from('personal_data')
@@ -42,11 +48,10 @@ Deno.serve(async (req) => {
       console.log("[EDGE FUNCTION] Dados pessoais salvos.");
     }
 
+    // Upsert do endereço
+    const addressData = enrollment.confirmed_address_data;
     if (addressData) {
       delete addressData.user_id;
-
-      // === O "TRADUTOR" DE DADOS - A CORREÇÃO FINAL ESTÁ AQUI ===
-      // Criamos um objeto novo e limpo, mapeando cada chave para o nome exato da coluna.
       const correctedAddressData = {
         cep: addressData.cep,
         logradouro: addressData.logradouro,
@@ -59,19 +64,20 @@ Deno.serve(async (req) => {
         temLocalizacaoDiferenciada: addressData.tem_localizacao_diferenciada ?? addressData.temLocalizacaoDiferenciada,
         localizacaoDiferenciada: addressData.localizacao_diferenciada ?? addressData.localizacaoDiferenciada,
       };
-
       const { error } = await supabaseClient.from('addresses')
         .upsert({ ...correctedAddressData, student_id: studentId }, { onConflict: 'student_id' });
       if (error) throw error;
       console.log("[EDGE FUNCTION] Endereço salvo.");
     }
 
+    // Upsert dos dados escolares
+    const schoolingData = enrollment.confirmed_schooling_data;
     if (schoolingData) {
       delete schoolingData.user_id;
-       const { error } = await supabaseClient.from('schooling_data')
+      const { error } = await supabaseClient.from('schooling_data')
         .upsert({ ...schoolingData, student_id: studentId }, { onConflict: 'student_id' });
-       if (error) throw error;
-       console.log("[EDGE FUNCTION] Dados escolares salvos.");
+      if (error) throw error;
+      console.log("[EDGE FUNCTION] Dados escolares salvos.");
     }
 
     return new Response(JSON.stringify({ message: "Dados processados com sucesso!" }), { status: 200 });
