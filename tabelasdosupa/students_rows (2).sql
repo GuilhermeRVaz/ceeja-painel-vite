@@ -1,0 +1,1 @@
+INSERT INTO "public"."students" ("id", "created_at", "enrollment_id") VALUES ('4cc057b8-edb4-49cf-9987-6fb7cdeca2fd', '2025-07-22 23:16:39.032914+00', 'ced858a8-b31e-4a2a-9ade-281c11baae01');
