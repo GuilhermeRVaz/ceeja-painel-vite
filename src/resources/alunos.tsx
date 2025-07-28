@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import {
     List, Datagrid, TextField, EmailField, TextInput, Edit,
     TabbedForm, FormTab, DateInput, Toolbar, SaveButton,
-    useRecordContext, useNotify, Filter, useEditController,
+    useNotify, Filter, useEditController,
     useDataProvider, BooleanInput, SelectInput,
     ArrayInput, SimpleFormIterator,
 } from "react-admin";
@@ -15,7 +15,7 @@ import { useQuery } from 'react-query';
 import type { RaRecord } from 'react-admin';
 import {
     Box, Typography, CircularProgress, Alert, Paper, Divider,
-    List as MuiList, ListItemButton, ListItemText, Grid
+    List as MuiList, ListItemButton, ListItemText, Grid, Button
 } from '@mui/material';
 
 // =====================================================================
@@ -185,78 +185,78 @@ const AlunoEditView: React.FC<{ mergedData: MergedData }> = ({ mergedData }) => 
                 <Box p={3}>
                     <Typography variant="h6" color="primary" gutterBottom>Identificação</Typography>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} md={8}>
+                        <Grid  xs={12} md={8}>
                             <TextInput source="nome_completo" label="Nome Completo" fullWidth />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <TextInput source="idade" label="Idade" />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <BooleanInput source="tem_nome_social" label="Tem Nome Social?" />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <TextInput source="nome_social" label="Nome Social" fullWidth />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <BooleanInput source="tem_nome_afetivo" label="Tem Nome Afetivo?" />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <TextInput source="nome_afetivo" label="Nome Afetivo" fullWidth />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <SelectInput source="sexo" label="Sexo" choices={[
                                 { id: "Masculino", name: "Masculino" },
                                 { id: "Feminino", name: "Feminino" }
                             ]} />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <DateInput source="data_nascimento" label="Data de Nascimento" />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <TextInput source="raca_cor" label="Raça/Cor" />
                         </Grid>
                     </Grid>
                     
                     <Typography variant="h6" color="primary" sx={{ mt: 3, mb: 1 }}>Documentos</Typography>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <TextInput source="rg" label="RG" />
                         </Grid>
-                        <Grid item xs={12} md={2}>
+                        <Grid  xs={12} md={2}>
                             <TextInput source="rg_digito" label="Dígito" />
                         </Grid>
-                        <Grid item xs={12} md={2}>
+                        <Grid  xs={12} md={2}>
                             <TextInput source="rg_uf" label="UF" />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <DateInput source="rg_data_emissao" label="Data de Emissão" />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <TextInput source="cpf" label="CPF" />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <TextInput source="telefone" label="Telefone" />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid  xs={12}>
                             <TextInput source="email" label="E-mail" fullWidth />
                         </Grid>
                     </Grid>
 
                     <Typography variant="h6" color="primary" sx={{ mt: 3, mb: 1 }}>Filiação e Origem</Typography>
                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
+                        <Grid  xs={12}>
                             <TextInput source="nome_mae" label="Nome da Mãe" fullWidth />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid  xs={12}>
                             <TextInput source="nome_pai" label="Nome do Pai" fullWidth />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <TextInput source="nacionalidade" label="Nacionalidade" />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <TextInput source="nascimento_uf" label="UF de Nascimento" />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <TextInput source="nascimento_cidade" label="Cidade de Nascimento" />
                         </Grid>
                     </Grid>
@@ -267,28 +267,28 @@ const AlunoEditView: React.FC<{ mergedData: MergedData }> = ({ mergedData }) => 
                 <Box p={3}>
                     <Typography variant="h6" color="primary" gutterBottom>Endereço Residencial</Typography>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} md={3}>
+                        <Grid  xs={12} md={3}>
                             <TextInput source="addresses.cep" label="CEP" />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <TextInput source="addresses.logradouro" label="Logradouro" fullWidth />
                         </Grid>
-                        <Grid item xs={12} md={3}>
+                        <Grid  xs={12} md={3}>
                             <TextInput source="addresses.numero" label="Número" />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid  xs={12}>
                             <TextInput source="addresses.complemento" label="Complemento" fullWidth />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <TextInput source="addresses.bairro" label="Bairro" />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <TextInput source="addresses.nomeCidade" label="Cidade" />
                         </Grid>
-                        <Grid item xs={12} md={2}>
+                        <Grid  xs={12} md={2}>
                             <TextInput source="addresses.ufCidade" label="UF" />
                         </Grid>
-                        <Grid item xs={12} md={2}>
+                        <Grid  xs={12} md={2}>
                             <SelectInput source="addresses.zona" label="Zona" choices={[
                                 { id: "Urbana", name: "Urbana" }, 
                                 { id: "Rural", name: "Rural" }
@@ -302,31 +302,31 @@ const AlunoEditView: React.FC<{ mergedData: MergedData }> = ({ mergedData }) => 
                 <Box p={3}>
                     <Typography variant="h6" color="primary" gutterBottom>Dados de Escolaridade</Typography>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <TextInput source="schooling_data.nivel_ensino" label="Nível de Ensino" />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <TextInput source="schooling_data.itinerario_formativo" label="Itinerário Formativo" />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <TextInput source="schooling_data.ultima_serie_concluida" label="Última Série Concluída" />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <TextInput source="schooling_data.ra" label="RA" />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <BooleanInput source="schooling_data.estudou_no_ceeja" label="Estudou no CEEJA?" />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <BooleanInput source="schooling_data.tem_progressao_parcial" label="Tem Progressão Parcial?" />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid  xs={12} md={4}>
                             <BooleanInput source="schooling_data.eliminou_disciplina" label="Eliminou Disciplina?" />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid  xs={12}>
                             <TextInput source="schooling_data.nome_escola" label="Nome da Escola" fullWidth />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid  xs={12} md={6}>
                             <SelectInput source="schooling_data.tipo_escola" label="Tipo de Escola" choices={[
                                 { id: "Pública", name: "Pública" },
                                 { id: "Privada", name: "Privada" }
@@ -523,7 +523,7 @@ export const AlunoEdit = () => {
     if (error || !mergedData) {
         return (
             <Alert severity="error">
-                {error?.message || 'Erro ao carregar dados do aluno'}
+                { (error as any)?.message || 'Erro ao carregar dados do aluno' }
             </Alert>
         );
     }
