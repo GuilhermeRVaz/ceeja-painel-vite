@@ -1,0 +1,30 @@
+[vite] connecting...
+client:827 [vite] connected.
+chunk-YQ5BCTVV.js?v=ad91a9ec:21609 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+web-vitals.js?v=ad91a9ec:13 {name: 'TTFB', value: 24.900000035762787, rating: 'good', delta: 24.900000035762787, entries: Array(1), …}
+App.tsx:95 🔧 Verificando configuração do ambiente...
+App.tsx:96 VITE_SUPABASE_URL: ✅ Definida
+App.tsx:97 VITE_SUPABASE_ANON_KEY: ✅ Definida
+App.tsx:95 🔧 Verificando configuração do ambiente...
+App.tsx:96 VITE_SUPABASE_URL: ✅ Definida
+App.tsx:97 VITE_SUPABASE_ANON_KEY: ✅ Definida
+chunk-YQ5BCTVV.js?v=ad91a9ec:377 [Violation] 'message' handler took 196ms
+web-vitals.js?v=ad91a9ec:13 {name: 'FCP', value: 1676, rating: 'good', delta: 1676, entries: Array(1), …}
+App.tsx:43 🔍 DataProvider.getList - Resource: personal_data {pagination: {…}, sort: {…}, filter: {…}, meta: undefined, signal: undefined}
+chunk-YQ5BCTVV.js?v=ad91a9ec:377 [Violation] 'message' handler took 162ms
+chunk-YQ5BCTVV.js?v=ad91a9ec:18675 [Violation] 'setTimeout' handler took 52ms
+web-vitals.js?v=ad91a9ec:13 {name: 'LCP', value: 1676, rating: 'good', delta: 1676, entries: Array(1), …}
+App.tsx:46 ✅ DataProvider.getList - Success: {resource: 'personal_data', total: 1, dataLength: 1}
+chunk-YQ5BCTVV.js?v=ad91a9ec:18675 [Violation] 'setTimeout' handler took 112ms
+App.tsx:58 🔍 DataProvider.getOne - Resource: personal_data {id: 'b07a5ab0-e93f-43e6-9efc-2875d62be50b', meta: undefined, signal: undefined}
+alunos.tsx:269 🔍 Buscando dados relacionados para studentId: 7a70fe49-2dd2-40b6-a2ba-8e9c334097a5
+App.tsx:43 🔍 DataProvider.getList - Resource: addresses {filter: {…}, pagination: {…}, sort: {…}}
+App.tsx:43 🔍 DataProvider.getList - Resource: schooling_data {filter: {…}, pagination: {…}, sort: {…}}
+App.tsx:46 ✅ DataProvider.getList - Success: {resource: 'schooling_data', total: 1, dataLength: 1}
+App.tsx:61 ✅ DataProvider.getOne - Success: {resource: 'personal_data', id: 'b07a5ab0-e93f-43e6-9efc-2875d62be50b'}
+App.tsx:46 ✅ DataProvider.getList - Success: {resource: 'addresses', total: 1, dataLength: 1}
+alunos.tsx:285 🔍 Dados de endereço: [{…}]
+alunos.tsx:286 🔍 Dados de escolaridade: [{…}]
+alunos.tsx:294 ✅ Dados mesclados: {id: 'b07a5ab0-e93f-43e6-9efc-2875d62be50b', nome_completo: 'ISABELLE CAVALCANTI SIMÕES', tem_nome_social: false, nome_social: null, tem_nome_afetivo: true, …}
+alunos.tsx:64 🔍 Record no AlunoEditView: {id: 'b07a5ab0-e93f-43e6-9efc-2875d62be50b', nome_completo: 'ISABELLE CAVALCANTI SIMÕES', tem_nome_social: false, nome_social: null, tem_nome_afetivo: true, …}
+alunos.tsx:64 🔍 Record no AlunoEditView: {id: 'b07a5ab0-e93

@@ -2,12 +2,12 @@
 // DESCRIÇÃO: Implementação da arquitetura "Orquestrador" para carregamento e salvamento
 // de dados relacionados (personal_data, addresses, schooling_data) sem conflitos
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import {
     List, Datagrid, TextField, EmailField, TextInput, Edit,
-    TabbedForm, FormTab, DateInput, Toolbar, SaveButton,
-    useNotify, Filter, useEditController,
+    TabbedForm, FormTab, DateInput, Toolbar, SaveButton, Button as RaButton,
+    useNotify, Filter, useEditController, useRecordContext,
     useDataProvider, BooleanInput, SelectInput,
     ArrayInput, SimpleFormIterator,
 } from "react-admin";
@@ -15,40 +15,19 @@ import { useQuery } from 'react-query';
 import type { RaRecord } from 'react-admin';
 import {
     Box, Typography, CircularProgress, Alert, Paper, Divider,
-    List as MuiList, ListItemButton, ListItemText, Grid, Button
+    List as MuiList, ListItemButton, ListItemText, Grid
 } from '@mui/material';
+import { DocumentViewer } from './DocumentViewer';
 
 // =====================================================================
 // TIPOS E CONSTANTES
 // =====================================================================
-interface DocumentExtraction {
-    id: string;
-    file_name: string;
-    storage_path: string;
-    document_type: string;
-    status: string;
-    enrollment_id: string;
-}
-
 interface MergedData extends RaRecord {
     student_id?: string | number;
     addresses?: any;
     schooling_data?: any;
     enrollment_id?: string;
 }
-
-const DOCUMENT_TYPE_LABELS: Record<string, string> = {
-    'rg_frente': 'RG - Frente',
-    'rg_verso': 'RG - Verso',
-    'cpf': 'CPF',
-    'certidao_nascimento_casamento': 'Certidão de Nascimento/Casamento',
-    'comprovante_residencia': 'Comprovante de Residência',
-    'historico_medio': 'Histórico Escolar - Ensino Médio',
-    'historico_medio_verso': 'Histórico Escolar - Verso',
-    'historico_fundamental': 'Histórico Escolar - Ensino Fundamental',
-    'declaracao_escolaridade': 'Declaração de Escolaridade',
-    'outros': 'Outros Documentos'
-};
 
 // =====================================================================
 // COMPONENTES DE UI
@@ -61,120 +40,25 @@ const CenterSpinner: React.FC<{ message?: string }> = ({ message = "Carregando..
 );
 
 // =====================================================================
-// COMPONENTE VISUALIZADOR DE DOCUMENTOS
-// =====================================================================
-const DocumentViewer: React.FC<{ studentId: string }> = ({ studentId }) => {
-    const [documents, setDocuments] = useState<DocumentExtraction[]>([]);
-    const [selectedDocument, setSelectedDocument] = useState<DocumentExtraction | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [documentUrl, setDocumentUrl] = useState<string>('');
-    const dataProvider = useDataProvider();
-    const notify = useNotify();
-
-    useEffect(() => {
-        const fetchDocuments = async () => {
-            if (!studentId) {
-                setLoading(false);
-                return;
-            }
-            try {
-                setLoading(true);
-                console.log('📄 Buscando documentos para studentId:', studentId);
-                
-                const enrollmentResponse = await dataProvider.getList('enrollments', {
-                    filter: { student_id: studentId },
-                    pagination: { page: 1, perPage: 10 },
-                    sort: { field: 'created_at', order: 'DESC' }
-                });
-
-                let finalDocuments: DocumentExtraction[] = [];
-                if (enrollmentResponse.data.length > 0) {
-                    const enrollmentId = enrollmentResponse.data[0].id;
-                    console.log('📄 Enrollment encontrado:', enrollmentId);
-                    
-                    const documentsResponse = await dataProvider.getList('document_extractions', {
-                        filter: { enrollment_id: enrollmentId },
-                        pagination: { page: 1, perPage: 100 },
-                        sort: { field: 'uploaded_at', order: 'DESC' }
-                    });
-                    finalDocuments = documentsResponse.data;
-                } else {
-                    console.log('📄 Nenhum enrollment encontrado, buscando documentos diretos');
-                    const directDocumentsResponse = await dataProvider.getList('document_extractions', {
-                        filter: { enrollment_id: studentId },
-                        pagination: { page: 1, perPage: 100 },
-                        sort: { field: 'uploaded_at', order: 'DESC' }
-                    });
-                    finalDocuments = directDocumentsResponse.data;
-                }
-                
-                console.log('📄 Documentos encontrados:', finalDocuments.length);
-                setDocuments(finalDocuments);
-                if (finalDocuments.length > 0) {
-                    setSelectedDocument(finalDocuments[0]);
-                }
-
-            } catch (error: any) {
-                console.error('❌ Erro ao carregar documentos:', error);
-                notify(`Erro ao carregar documentos: ${error.message}`, { type: 'error' });
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchDocuments();
-    }, [studentId, dataProvider, notify]);
-
-    useEffect(() => {
-        if (selectedDocument?.storage_path) {
-            const baseUrl = (import.meta as any).env.VITE_SUPABASE_URL;
-            const publicUrl = `${baseUrl}/storage/v1/object/public/documents/${selectedDocument.storage_path}`;
-            setDocumentUrl(publicUrl);
-        } else {
-            setDocumentUrl('');
-        }
-    }, [selectedDocument]);
-
-    const getDocumentLabel = (doc: DocumentExtraction) => DOCUMENT_TYPE_LABELS[doc.document_type] || doc.file_name;
-
-    if (loading) return <CenterSpinner message="Carregando documentos..." />;
-    if (documents.length === 0) return <Alert severity="info">Nenhum documento encontrado.</Alert>;
-
-    return (
-        <Box sx={{ height: '600px', display: 'flex', gap: 2 }}>
-            <Paper sx={{ width: '300px', overflow: 'auto' }}>
-                <MuiList>
-                    {documents.map((doc) => (
-                        <ListItemButton 
-                            key={doc.id} 
-                            selected={selectedDocument?.id === doc.id} 
-                            onClick={() => setSelectedDocument(doc)}
-                        >
-                            <ListItemText primary={getDocumentLabel(doc)} />
-                        </ListItemButton>
-                    ))}
-                </MuiList>
-            </Paper>
-            <Paper sx={{ flex: 1 }}>
-                {documentUrl ? (
-                    <iframe 
-                        src={documentUrl} 
-                        style={{ width: '100%', height: '100%', border: 'none' }} 
-                        title={selectedDocument?.file_name} 
-                    />
-                ) : (
-                    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                        <Typography>Selecione um documento para visualizar</Typography>
-                    </Box>
-                )}
-            </Paper>
-        </Box>
-    );
-};
-
-// =====================================================================
 // BARRA DE FERRAMENTAS E FORMULÁRIO DE EDIÇÃO
 // =====================================================================
-const AlunoEditToolbar = () => <Toolbar><SaveButton label="Salvar Alterações" /></Toolbar>;
+const AlunoEditToolbar = () => {
+    const record = useRecordContext();
+    const notify = useNotify();
+    const handleApproveAndAutomate = () => {
+        if (!record) return;
+        console.log('CHAMANDO API DO ROBÔ PLAYWRIGHT para o aluno ID:', record.id);
+        notify('Automação na SED iniciada!', { type: 'info' });
+    };
+    return (
+        <Toolbar>
+            <SaveButton label="Salvar Todas as Alterações" />
+            <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                <RaButton label="Aprovar e Iniciar Matrícula na SED" onClick={handleApproveAndAutomate} />
+            </Box>
+        </Toolbar>
+    );
+};
 
 const AlunoEditView: React.FC<{ mergedData: MergedData }> = ({ mergedData }) => {
     console.log('🔍 Record no AlunoEditView:', mergedData);
@@ -290,7 +174,7 @@ const AlunoEditView: React.FC<{ mergedData: MergedData }> = ({ mergedData }) => 
                         </Grid>
                         <Grid  xs={12} md={2}>
                             <SelectInput source="addresses.zona" label="Zona" choices={[
-                                { id: "Urbana", name: "Urbana" }, 
+                                { id: "Urbana", name: "Urbana" },
                                 { id: "Rural", name: "Rural" }
                             ]} />
                         </Grid>
@@ -346,10 +230,21 @@ const AlunoEditView: React.FC<{ mergedData: MergedData }> = ({ mergedData }) => 
 
             <FormTab label="Documentos">
                 <Box p={2}>
-                    {mergedData?.id ? (
-                        <DocumentViewer studentId={String(mergedData.student_id || mergedData.id)} />
+                    <Typography variant="h6" gutterBottom color="primary">
+                        Verificação de Documentos
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+                        Compare os documentos escaneados com os dados preenchidos no formulário
+                    </Typography>
+                    
+                    {mergedData?.student_id || mergedData?.id ? (
+                        <DocumentViewer
+                            studentId={String(mergedData.student_id || mergedData.id)}
+                        />
                     ) : (
-                        <Alert severity="warning">ID do estudante não encontrado.</Alert>
+                        <Alert severity="warning">
+                            ID do estudante não encontrado para carregar documentos.
+                        </Alert>
                     )}
                 </Box>
             </FormTab>
@@ -429,11 +324,21 @@ export const AlunoEdit = () => {
         try {
             console.log('💾 Transform iniciado com dados:', data);
             
-            // SEPARAR corretamente os dados para evitar envio de campos aninhados
-            const { addresses, schooling_data, ...personal_data } = data;
+            // Clonar os dados para evitar mutação do estado original
+            const dataToSave = { ...data };
+
+            // Extrair os dados aninhados do objeto principal
+            const addresses = dataToSave.addresses;
+            const schooling_data = dataToSave.schooling_data;
+            
+            // Remover os objetos aninhados do payload de personal_data
+            delete dataToSave.addresses;
+            delete dataToSave.schooling_data;
+            
+            const personal_data = dataToSave;
             const studentId = personal_data.student_id || personal_data.id;
 
-            console.log('💾 Dados separados:', { 
+            console.log('💾 Dados separados:', {
                 personal_keys: Object.keys(personal_data),
                 addresses_keys: Object.keys(addresses || {}),
                 schooling_keys: Object.keys(schooling_data || {})
@@ -441,31 +346,26 @@ export const AlunoEdit = () => {
 
             const updates = [];
             
-            // 1. SEMPRE atualiza os dados pessoais (SEM campos aninhados)
-            const cleanPersonalData = { ...personal_data };
-            delete cleanPersonalData.addresses;           // Remove nested data
-            delete cleanPersonalData.schooling_data;     // Remove nested data
-            delete cleanPersonalData.enrollment_id;      // Remove enrollment reference
-            
-            console.log('💾 Salvando dados pessoais limpos:', cleanPersonalData);
+            // 1. SEMPRE atualiza os dados pessoais (agora limpos)
+            console.log('💾 Salvando dados pessoais limpos:', personal_data);
             updates.push(
-                dataProvider.update('personal_data', { 
-                    id: personal_data.id, 
-                    data: cleanPersonalData, 
-                    previousData: personalDataRecord! 
+                dataProvider.update('personal_data', {
+                    id: personal_data.id,
+                    data: personal_data,
+                    previousData: personalDataRecord!
                 })
             );
 
             // 2. Salvar endereço (CREATE ou UPDATE)
-            if (addresses && Object.keys(addresses).some(key => key !== 'student_id' && addresses[key] != null && addresses[key] !== '')) {
+            if (addresses && Object.keys(addresses).length > 0) {
                 const addressPayload = { ...addresses, student_id: studentId };
                 if (addresses.id) {
                     console.log('🏠 Atualizando endereço existente ID:', addresses.id);
                     updates.push(
-                        dataProvider.update('addresses', { 
-                            id: addresses.id, 
-                            data: addressPayload, 
-                            previousData: mergedData!.addresses 
+                        dataProvider.update('addresses', {
+                            id: addresses.id,
+                            data: addressPayload,
+                            previousData: mergedData!.addresses
                         })
                     );
                 } else {
@@ -477,15 +377,15 @@ export const AlunoEdit = () => {
             }
 
             // 3. Salvar dados de escolaridade (CREATE ou UPDATE)
-            if (schooling_data && Object.keys(schooling_data).some(key => key !== 'student_id' && schooling_data[key] != null && schooling_data[key] !== '')) {
+            if (schooling_data && Object.keys(schooling_data).length > 0) {
                 const schoolingPayload = { ...schooling_data, student_id: studentId };
                 if (schooling_data.id) {
                     console.log('🎓 Atualizando escolaridade existente ID:', schooling_data.id);
                     updates.push(
-                        dataProvider.update('schooling_data', { 
-                            id: schooling_data.id, 
-                            data: schoolingPayload, 
-                            previousData: mergedData!.schooling_data 
+                        dataProvider.update('schooling_data', {
+                            id: schooling_data.id,
+                            data: schoolingPayload,
+                            previousData: mergedData!.schooling_data
                         })
                     );
                 } else {
