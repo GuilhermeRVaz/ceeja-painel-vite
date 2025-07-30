@@ -1,14 +1,22 @@
 import React from 'react';
 import {
-    Box, 
-    Typography, 
-    CircularProgress, 
-    Alert, 
-    Paper, 
-    List as MuiList, 
-    ListItemButton, 
-    ListItemText
+    Box,
+    Typography,
+    CircularProgress,
+    Alert,
+    Paper,
+    List as MuiList,
+    ListItemButton,
+    ListItemText,
+    IconButton,
+    Tooltip,
 } from '@mui/material';
+import {
+    ZoomIn as ZoomInIcon,
+    ZoomOut as ZoomOutIcon,
+    RestartAlt as ResetIcon,
+} from '@mui/icons-material';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useStudentDocuments } from '../hooks/useStudentDocuments';
 
 // =====================================================================
@@ -18,7 +26,6 @@ interface DocumentViewerProps {
     studentId: string;
 }
 
-// Mapeamento de tipos de documento para labels amigáveis
 const DOCUMENT_TYPE_LABELS: Record<string, string> = {
     'rg_frente': 'RG - Frente',
     'rg_verso': 'RG - Verso',
@@ -36,11 +43,11 @@ const DOCUMENT_TYPE_LABELS: Record<string, string> = {
 // COMPONENTE DE LOADING CENTRALIZADO
 // =====================================================================
 const CenterSpinner: React.FC<{ message?: string }> = ({ message = "Carregando..." }) => (
-    <Box 
-        display="flex" 
-        flexDirection="column" 
-        justifyContent="center" 
-        alignItems="center" 
+    <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
         minHeight="400px"
     >
         <CircularProgress size={60} />
@@ -54,7 +61,6 @@ const CenterSpinner: React.FC<{ message?: string }> = ({ message = "Carregando..
 // COMPONENTE PRINCIPAL - DOCUMENT VIEWER
 // =====================================================================
 export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => {
-    // Hook customizado com toda a lógica de negócio
     const {
         documents,
         selectedDocument,
@@ -65,16 +71,10 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => 
         noDocumentsFound
     } = useStudentDocuments(studentId);
 
-    // =====================================================================
-    // FUNÇÃO HELPER PARA OBTER LABEL DO DOCUMENTO
-    // =====================================================================
     const getDocumentLabel = (doc: any) => {
         return DOCUMENT_TYPE_LABELS[doc.document_type] || doc.file_name || 'Documento';
     };
 
-    // =====================================================================
-    // RENDERIZAÇÃO CONDICIONAL - ESTADOS DE LOADING E ERRO
-    // =====================================================================
     if (loading) {
         return <CenterSpinner message="Carregando documentos..." />;
     }
@@ -95,7 +95,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => 
                 <Typography variant="h6" gutterBottom>Nenhum documento visível</Typography>
                 <Typography variant="body2">
                     A matrícula do aluno foi encontrada, mas nenhum documento pôde ser carregado.
-                    <br/><br/>
+                    <br /><br />
                     <strong>Causa provável:</strong> A política de segurança do banco de dados (Row-Level Security) pode estar impedindo o acesso. Verifique se o usuário atual tem permissão para ler a tabela `document_extractions`.
                 </Typography>
             </Alert>
@@ -112,18 +112,17 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => 
         );
     }
 
-    // =====================================================================
-    // RENDERIZAÇÃO PRINCIPAL - LAYOUT DE DUAS COLUNAS
-    // =====================================================================
     return (
-        <Box sx={{ height: '600px', display: 'flex', gap: 2, p: 1 }}>
+        <Box sx={{ height: 'calc(100vh - 200px)', display: 'flex', gap: 2, p: 1 }}>
             {/* COLUNA DA ESQUERDA - Lista de Documentos */}
-            <Paper 
-                sx={{ 
-                    width: '300px', 
+            <Paper
+                sx={{
+                    width: '300px',
                     overflow: 'auto',
                     borderRadius: 2,
-                    boxShadow: 2
+                    boxShadow: 2,
+                    display: 'flex',
+                    flexDirection: 'column'
                 }}
             >
                 <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
@@ -131,10 +130,9 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => 
                         Documentos ({documents.length})
                     </Typography>
                 </Box>
-                
-                <MuiList sx={{ p: 0 }}>
+                <MuiList sx={{ p: 0, flex: 1, overflow: 'auto' }}>
                     {documents.map((doc, index) => (
-                        <ListItemButton 
+                        <ListItemButton
                             key={doc.id || index}
                             selected={selectedDocument?.id === doc.id}
                             onClick={() => setSelectedDocument(doc)}
@@ -149,7 +147,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => 
                                 }
                             }}
                         >
-                            <ListItemText 
+                            <ListItemText
                                 primary={getDocumentLabel(doc)}
                                 secondary={doc.status || 'Status não informado'}
                                 primaryTypographyProps={{
@@ -167,51 +165,86 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => 
             </Paper>
 
             {/* COLUNA DA DIREITA - Visualizador do Documento */}
-            <Paper 
-                sx={{ 
-                    flex: 1, 
-                    display: 'flex', 
+            <Paper
+                sx={{
+                    flex: 1,
+                    display: 'flex',
                     flexDirection: 'column',
                     borderRadius: 2,
                     boxShadow: 2,
                     overflow: 'hidden'
                 }}
             >
-                {/* Header do visualizador */}
                 {selectedDocument && (
-                    <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0', backgroundColor: '#f8f9fa' }}>
-                        <Typography variant="h6" color="primary">
-                            {getDocumentLabel(selectedDocument)}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            Arquivo: {selectedDocument.file_name}
-                        </Typography>
+                    <Box sx={{ p: 1, borderBottom: '1px solid #e0e0e0', backgroundColor: '#f8f9fa', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box>
+                            <Typography variant="h6" color="primary">
+                                {getDocumentLabel(selectedDocument)}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                Arquivo: {selectedDocument.file_name}
+                            </Typography>
+                        </Box>
                     </Box>
                 )}
 
-                {/* Conteúdo do visualizador */}
-                <Box sx={{ flex: 1, display: 'flex' }}>
+                <Box sx={{ flex: 1, position: 'relative', backgroundColor: '#e0e0e0' }}>
                     {documentUrl ? (
-                        <iframe 
-                            src={documentUrl}
-                            style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                border: 'none',
-                                backgroundColor: '#fff'
-                            }}
-                            title={selectedDocument?.file_name || 'Documento'}
-                            onError={(e) => {
-                                console.error('❌ Erro ao carregar iframe:', e);
-                            }}
-                        />
+                        <TransformWrapper
+                            initialScale={1}
+                            initialPositionX={0}
+                            initialPositionY={0}
+                        >
+                            {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+                                <>
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 8,
+                                            right: 8,
+                                            zIndex: 10,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                            borderRadius: '4px',
+                                            display: 'flex',
+                                            gap: '4px'
+                                        }}
+                                    >
+                                        <Tooltip title="Aumentar Zoom">
+                                            <IconButton onClick={() => zoomIn()} size="small"><ZoomInIcon /></IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Diminuir Zoom">
+                                            <IconButton onClick={() => zoomOut()} size="small"><ZoomOutIcon /></IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Resetar Zoom">
+                                            <IconButton onClick={() => resetTransform()} size="small"><ResetIcon /></IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                    <TransformComponent
+                                        wrapperStyle={{ width: '100%', height: '100%' }}
+                                        contentStyle={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                                    >
+                                        <img
+                                            src={documentUrl}
+                                            alt={selectedDocument?.file_name || 'Documento'}
+                                            style={{
+                                                maxWidth: '100%',
+                                                maxHeight: '100%',
+                                                objectFit: 'contain',
+                                            }}
+                                            onError={(e) => {
+                                                console.error('❌ Erro ao carregar imagem:', e);
+                                            }}
+                                        />
+                                    </TransformComponent>
+                                </>
+                            )}
+                        </TransformWrapper>
                     ) : (
-                        <Box 
-                            display="flex" 
-                            justifyContent="center" 
-                            alignItems="center" 
+                        <Box
+                            display="flex"
+                            justifyContent="center"
+                            alignItems="center"
                             height="100%"
-                            sx={{ backgroundColor: '#f5f5f5' }}
                         >
                             <Typography variant="body1" color="text.secondary">
                                 {selectedDocument ? 'Carregando documento...' : 'Selecione um documento para visualizar'}

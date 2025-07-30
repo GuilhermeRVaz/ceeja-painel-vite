@@ -15,7 +15,7 @@ import { useQuery } from 'react-query';
 import type { RaRecord } from 'react-admin';
 import {
     Box, Typography, CircularProgress, Alert, Paper, Divider,
-    List as MuiList, ListItemButton, ListItemText, Grid
+    List as MuiList, ListItemButton, ListItemText
 } from '@mui/material';
 import { DocumentViewer } from './DocumentViewer';
 
@@ -68,155 +68,70 @@ const AlunoEditView: React.FC<{ mergedData: MergedData }> = ({ mergedData }) => 
             <FormTab label="Dados Pessoais">
                 <Box p={3}>
                     <Typography variant="h6" color="primary" gutterBottom>Identificação</Typography>
-                    <Grid container spacing={2}>
-                        <Grid  xs={12} md={8}>
-                            <TextInput source="nome_completo" label="Nome Completo" fullWidth />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <TextInput source="idade" label="Idade" />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <BooleanInput source="tem_nome_social" label="Tem Nome Social?" />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <TextInput source="nome_social" label="Nome Social" fullWidth />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <BooleanInput source="tem_nome_afetivo" label="Tem Nome Afetivo?" />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <TextInput source="nome_afetivo" label="Nome Afetivo" fullWidth />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <SelectInput source="sexo" label="Sexo" choices={[
-                                { id: "Masculino", name: "Masculino" },
-                                { id: "Feminino", name: "Feminino" }
-                            ]} />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <DateInput source="data_nascimento" label="Data de Nascimento" />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <TextInput source="raca_cor" label="Raça/Cor" />
-                        </Grid>
-                    </Grid>
-                    
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                        <Box sx={{ flex: '1 1 60%', minWidth: '300px' }}><TextInput source="nome_completo" label="Nome Completo" fullWidth /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><TextInput source="idade" label="Idade" /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><BooleanInput source="tem_nome_social" label="Tem Nome Social?" /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><TextInput source="nome_social" label="Nome Social" fullWidth /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><BooleanInput source="tem_nome_afetivo" label="Tem Nome Afetivo?" /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><TextInput source="nome_afetivo" label="Nome Afetivo" fullWidth /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><SelectInput source="sexo" label="Sexo" choices={[{ id: "Masculino", name: "Masculino" }, { id: "Feminino", name: "Feminino" }]} /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><DateInput source="data_nascimento" label="Data de Nascimento" /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><TextInput source="raca_cor" label="Raça/Cor" /></Box>
+                    </Box>
+
                     <Typography variant="h6" color="primary" sx={{ mt: 3, mb: 1 }}>Documentos</Typography>
-                    <Grid container spacing={2}>
-                        <Grid  xs={12} md={4}>
-                            <TextInput source="rg" label="RG" />
-                        </Grid>
-                        <Grid  xs={12} md={2}>
-                            <TextInput source="rg_digito" label="Dígito" />
-                        </Grid>
-                        <Grid  xs={12} md={2}>
-                            <TextInput source="rg_uf" label="UF" />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <DateInput source="rg_data_emissao" label="Data de Emissão" />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <TextInput source="cpf" label="CPF" />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <TextInput source="telefone" label="Telefone" />
-                        </Grid>
-                        <Grid  xs={12}>
-                            <TextInput source="email" label="E-mail" fullWidth />
-                        </Grid>
-                    </Grid>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><TextInput source="rg" label="RG" /></Box>
+                        <Box sx={{ flex: '1 1 15%', minWidth: '100px' }}><TextInput source="rg_digito" label="Dígito" /></Box>
+                        <Box sx={{ flex: '1 1 15%', minWidth: '100px' }}><TextInput source="rg_uf" label="UF" /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><DateInput source="rg_data_emissao" label="Data de Emissão" /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><TextInput source="cpf" label="CPF" /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><TextInput source="telefone" label="Telefone" /></Box>
+                        <Box sx={{ flex: '1 1 100%', minWidth: '300px' }}><TextInput source="email" label="E-mail" fullWidth /></Box>
+                    </Box>
 
                     <Typography variant="h6" color="primary" sx={{ mt: 3, mb: 1 }}>Filiação e Origem</Typography>
-                    <Grid container spacing={2}>
-                        <Grid  xs={12}>
-                            <TextInput source="nome_mae" label="Nome da Mãe" fullWidth />
-                        </Grid>
-                        <Grid  xs={12}>
-                            <TextInput source="nome_pai" label="Nome do Pai" fullWidth />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <TextInput source="nacionalidade" label="Nacionalidade" />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <TextInput source="nascimento_uf" label="UF de Nascimento" />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <TextInput source="nascimento_cidade" label="Cidade de Nascimento" />
-                        </Grid>
-                    </Grid>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                        <Box sx={{ flex: '1 1 100%', minWidth: '300px' }}><TextInput source="nome_mae" label="Nome da Mãe" fullWidth /></Box>
+                        <Box sx={{ flex: '1 1 100%', minWidth: '300px' }}><TextInput source="nome_pai" label="Nome do Pai" fullWidth /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><TextInput source="nacionalidade" label="Nacionalidade" /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><TextInput source="nascimento_uf" label="UF de Nascimento" /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><TextInput source="nascimento_cidade" label="Cidade de Nascimento" /></Box>
+                    </Box>
                 </Box>
             </FormTab>
 
             <FormTab label="Endereço">
                 <Box p={3}>
                     <Typography variant="h6" color="primary" gutterBottom>Endereço Residencial</Typography>
-                    <Grid container spacing={2}>
-                        <Grid  xs={12} md={3}>
-                            <TextInput source="addresses.cep" label="CEP" />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <TextInput source="addresses.logradouro" label="Logradouro" fullWidth />
-                        </Grid>
-                        <Grid  xs={12} md={3}>
-                            <TextInput source="addresses.numero" label="Número" />
-                        </Grid>
-                        <Grid  xs={12}>
-                            <TextInput source="addresses.complemento" label="Complemento" fullWidth />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <TextInput source="addresses.bairro" label="Bairro" />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <TextInput source="addresses.nomeCidade" label="Cidade" />
-                        </Grid>
-                        <Grid  xs={12} md={2}>
-                            <TextInput source="addresses.ufCidade" label="UF" />
-                        </Grid>
-                        <Grid  xs={12} md={2}>
-                            <SelectInput source="addresses.zona" label="Zona" choices={[
-                                { id: "Urbana", name: "Urbana" },
-                                { id: "Rural", name: "Rural" }
-                            ]} />
-                        </Grid>
-                    </Grid>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                        <Box sx={{ flex: '1 1 20%', minWidth: '150px' }}><TextInput source="addresses.cep" label="CEP" /></Box>
+                        <Box sx={{ flex: '1 1 55%', minWidth: '300px' }}><TextInput source="addresses.logradouro" label="Logradouro" fullWidth /></Box>
+                        <Box sx={{ flex: '1 1 20%', minWidth: '100px' }}><TextInput source="addresses.numero" label="Número" /></Box>
+                        <Box sx={{ flex: '1 1 100%', minWidth: '300px' }}><TextInput source="addresses.complemento" label="Complemento" fullWidth /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><TextInput source="addresses.bairro" label="Bairro" /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><TextInput source="addresses.nomeCidade" label="Cidade" /></Box>
+                        <Box sx={{ flex: '1 1 15%', minWidth: '100px' }}><TextInput source="addresses.ufCidade" label="UF" /></Box>
+                        <Box sx={{ flex: '1 1 15%', minWidth: '100px' }}><SelectInput source="addresses.zona" label="Zona" choices={[{ id: "Urbana", name: "Urbana" }, { id: "Rural", name: "Rural" }]} /></Box>
+                    </Box>
                 </Box>
             </FormTab>
 
             <FormTab label="Escolaridade">
                 <Box p={3}>
                     <Typography variant="h6" color="primary" gutterBottom>Dados de Escolaridade</Typography>
-                    <Grid container spacing={2}>
-                        <Grid  xs={12} md={6}>
-                            <TextInput source="schooling_data.nivel_ensino" label="Nível de Ensino" />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <TextInput source="schooling_data.itinerario_formativo" label="Itinerário Formativo" />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <TextInput source="schooling_data.ultima_serie_concluida" label="Última Série Concluída" />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <TextInput source="schooling_data.ra" label="RA" />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <BooleanInput source="schooling_data.estudou_no_ceeja" label="Estudou no CEEJA?" />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <BooleanInput source="schooling_data.tem_progressao_parcial" label="Tem Progressão Parcial?" />
-                        </Grid>
-                        <Grid  xs={12} md={4}>
-                            <BooleanInput source="schooling_data.eliminou_disciplina" label="Eliminou Disciplina?" />
-                        </Grid>
-                        <Grid  xs={12}>
-                            <TextInput source="schooling_data.nome_escola" label="Nome da Escola" fullWidth />
-                        </Grid>
-                        <Grid  xs={12} md={6}>
-                            <SelectInput source="schooling_data.tipo_escola" label="Tipo de Escola" choices={[
-                                { id: "Pública", name: "Pública" },
-                                { id: "Privada", name: "Privada" }
-                            ]} />
-                        </Grid>
-                    </Grid>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><TextInput source="schooling_data.nivel_ensino" label="Nível de Ensino" /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><TextInput source="schooling_data.itinerario_formativo" label="Itinerário Formativo" /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><TextInput source="schooling_data.ultima_serie_concluida" label="Última Série Concluída" /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><TextInput source="schooling_data.ra" label="RA" /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><BooleanInput source="schooling_data.estudou_no_ceeja" label="Estudou no CEEJA?" /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><BooleanInput source="schooling_data.tem_progressao_parcial" label="Tem Progressão Parcial?" /></Box>
+                        <Box sx={{ flex: '1 1 30%', minWidth: '150px' }}><BooleanInput source="schooling_data.eliminou_disciplina" label="Eliminou Disciplina?" /></Box>
+                        <Box sx={{ flex: '1 1 100%', minWidth: '300px' }}><TextInput source="schooling_data.nome_escola" label="Nome da Escola" fullWidth /></Box>
+                        <Box sx={{ flex: '1 1 45%', minWidth: '200px' }}><SelectInput source="schooling_data.tipo_escola" label="Tipo de Escola" choices={[{ id: "Pública", name: "Pública" }, { id: "Privada", name: "Privada" }]} /></Box>
+                    </Box>
                     <Box mt={2}>
                         <Typography variant="subtitle1" gutterBottom>Disciplinas em Dependência</Typography>
                         <ArrayInput source="schooling_data.progressao_parcial_disciplinas">
