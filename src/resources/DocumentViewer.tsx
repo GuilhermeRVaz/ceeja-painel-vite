@@ -171,8 +171,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => 
                     display: 'flex',
                     flexDirection: 'column',
                     borderRadius: 2,
-                    boxShadow: 2,
-                    overflow: 'hidden'
+                    boxShadow: 2
                 }}
             >
                 {selectedDocument && (
@@ -188,57 +187,79 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => 
                     </Box>
                 )}
 
-                <Box sx={{ flex: 1, position: 'relative', backgroundColor: '#e0e0e0' }}>
-                    {documentUrl ? (
-                        <TransformWrapper
-                            initialScale={1}
-                            initialPositionX={0}
-                            initialPositionY={0}
-                        >
-                            {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-                                <>
-                                    <Box
-                                        sx={{
-                                            position: 'absolute',
-                                            top: 8,
-                                            right: 8,
-                                            zIndex: 10,
-                                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                                            borderRadius: '4px',
-                                            display: 'flex',
-                                            gap: '4px'
-                                        }}
-                                    >
-                                        <Tooltip title="Aumentar Zoom">
-                                            <IconButton onClick={() => zoomIn()} size="small"><ZoomInIcon /></IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Diminuir Zoom">
-                                            <IconButton onClick={() => zoomOut()} size="small"><ZoomOutIcon /></IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Resetar Zoom">
-                                            <IconButton onClick={() => resetTransform()} size="small"><ResetIcon /></IconButton>
-                                        </Tooltip>
+                <Box sx={{ flex: 1, position: 'relative', backgroundColor: '#e0e0e0', minHeight: 0 }}>
+                    {documentUrl && selectedDocument ? (
+                        <>
+                            {selectedDocument.file_name?.toLowerCase().endsWith('.pdf') ? (
+                                <object
+                                    data={documentUrl}
+                                    type="application/pdf"
+                                    width="100%"
+                                    height="100%"
+                                    aria-label="Visualizador de PDF"
+                                >
+                                    <Box sx={{ p: 2 }}>
+                                        <Alert severity="warning">
+                                            Seu navegador não suporta a visualização de PDFs. Tente abrir o arquivo em uma nova aba.
+                                            <a href={documentUrl} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px' }}>
+                                                Abrir PDF
+                                            </a>
+                                        </Alert>
                                     </Box>
-                                    <TransformComponent
-                                        wrapperStyle={{ width: '100%', height: '100%' }}
-                                        contentStyle={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                                    >
-                                        <img
-                                            src={documentUrl}
-                                            alt={selectedDocument?.file_name || 'Documento'}
-                                            style={{
-                                                maxWidth: '100%',
-                                                maxHeight: '100%',
-                                                objectFit: 'contain',
-                                            }}
-                                            onError={(e) => {
-                                                console.error('❌ Erro ao carregar imagem:', e);
-                                            }}
-                                        />
-                                    </TransformComponent>
-                                </>
+                                </object>
+                            ) : (
+                                <TransformWrapper
+                                    key={selectedDocument.id} // Força a recriação do componente ao mudar de documento
+                                    initialScale={1}
+                                    initialPositionX={0}
+                                    initialPositionY={0}
+                                >
+                                    {({ zoomIn, zoomOut, resetTransform }) => (
+                                        <>
+                                            <Box
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 8,
+                                                    right: 8,
+                                                    zIndex: 10,
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                                    borderRadius: '4px',
+                                                    display: 'flex',
+                                                    gap: '4px'
+                                                }}
+                                            >
+                                                <Tooltip title="Aumentar Zoom">
+                                                    <IconButton onClick={() => zoomIn()} size="small"><ZoomInIcon /></IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Diminuir Zoom">
+                                                    <IconButton onClick={() => zoomOut()} size="small"><ZoomOutIcon /></IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Resetar Zoom">
+                                                    <IconButton onClick={() => resetTransform()} size="small"><ResetIcon /></IconButton>
+                                                </Tooltip>
+                                            </Box>
+                                            <TransformComponent
+                                                wrapperStyle={{ width: '100%', height: '100%' }}
+                                                contentStyle={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                                            >
+                                                <img
+                                                    src={documentUrl}
+                                                    alt={selectedDocument?.file_name || 'Documento'}
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        maxHeight: '100%',
+                                                        objectFit: 'contain',
+                                                    }}
+                                                    onError={(e) => {
+                                                        console.error('❌ Erro ao carregar imagem:', e);
+                                                    }}
+                                                />
+                                            </TransformComponent>
+                                        </>
+                                    )}
+                                </TransformWrapper>
                             )}
-                        </TransformWrapper>
+                        </>
                     ) : (
                         <Box
                             display="flex"
@@ -254,5 +275,95 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({ studentId }) => 
                 </Box>
             </Paper>
         </Box>
+    );
+};
+
+// =====================================================================
+// COMPONENTE AUXILIAR PARA RENDERIZAR O CONTEÚDO DO DOCUMENTO
+// =====================================================================
+interface DocumentContentProps {
+    document: any;
+    url: string;
+}
+
+const DocumentContent: React.FC<DocumentContentProps> = ({ document, url }) => {
+    const isPdf = document.file_name?.toLowerCase().endsWith('.pdf');
+
+    if (isPdf) {
+        return (
+            <object
+                data={url}
+                type="application/pdf"
+                width="100%"
+                height="100%"
+                aria-label={`Visualizador de PDF para ${document.file_name}`}
+            >
+                <Box sx={{ p: 2, color: 'white' }}>
+                    <Alert severity="error">
+                        Seu navegador não consegue exibir este PDF.
+                        <a href={url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: '8px', color: 'inherit' }}>
+                            Abrir em nova aba.
+                        </a>
+                    </Alert>
+                </Box>
+            </object>
+        );
+    }
+
+    return (
+        <TransformWrapper
+            initialScale={1}
+            initialPositionX={0}
+            initialPositionY={0}
+            minScale={0.5}
+            maxScale={8}
+        >
+            {({ zoomIn, zoomOut, resetTransform }) => (
+                <>
+                    {/* Controles de Zoom */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 10,
+                            right: 10,
+                            zIndex: 1,
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            borderRadius: '4px',
+                            display: 'flex',
+                            gap: '4px',
+                            p: '4px'
+                        }}
+                    >
+                        <Tooltip title="Aumentar Zoom">
+                            <IconButton onClick={() => zoomIn()} size="small" sx={{ color: 'white' }}><ZoomInIcon /></IconButton>
+                        </Tooltip>
+                        <Tooltip title="Diminuir Zoom">
+                            <IconButton onClick={() => zoomOut()} size="small" sx={{ color: 'white' }}><ZoomOutIcon /></IconButton>
+                        </Tooltip>
+                        <Tooltip title="Resetar Zoom">
+                            <IconButton onClick={() => resetTransform()} size="small" sx={{ color: 'white' }}><ResetIcon /></IconButton>
+                        </Tooltip>
+                    </Box>
+
+                    {/* Componente da Imagem */}
+                    <TransformComponent
+                        wrapperStyle={{ width: '100%', height: '100%' }}
+                        contentStyle={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                        <img
+                            src={url}
+                            alt={document.file_name || 'Documento do aluno'}
+                            style={{
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                objectFit: 'contain',
+                                display: 'block'
+                            }}
+                            onError={(e) => console.error('❌ Erro ao carregar imagem:', e)}
+                        />
+                    </TransformComponent>
+                </>
+            )}
+        </TransformWrapper>
     );
 };
